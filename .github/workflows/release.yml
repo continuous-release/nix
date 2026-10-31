@@ -1,0 +1,32 @@
+name: release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.repository }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    uses: continuous-release/.github/.github/workflows/auto-release.yml@main
+    with:
+      system: nix
+      test-command: nix flake check --print-build-logs
+      build-command: |
+        set -euo pipefail
+        echo "$VERSION" > version.txt
+        git add -f version.txt
+        nix build .#default --print-build-logs
+        mkdir -p dist
+        cp -L result/bin/continuous-release-nix dist/
+        tar -C dist -czf "dist/continuous-release-nix-$VERSION-x86_64-linux.tar.gz" continuous-release-nix
+      artifact-glob: dist/*.tar.gz

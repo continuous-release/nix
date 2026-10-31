@@ -1,0 +1,10 @@
+[package]
+name = "continuous-release-nix"
+version = "0.0.0"
+edition = "2021"
+description = "Nix build-system testbed for continuous-release"
+license = "MIT"
+
+[[bin]]
+name = "continuous-release-nix"
+path = "src/main.rs"
